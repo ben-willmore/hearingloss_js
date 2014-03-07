@@ -15,7 +15,7 @@ if (false) {
   navigator.getMedia({video:false, audio:true}, gotAudio);
 
   function gotAudio(stream) {
-    alert('hi');
+    alert('Put on some headphones or prepare for feedback!');
     microphone = context.createMediaStreamSource(stream);
     simulator = createPresbyacusisSimulation(context, 100, 40);
     microphone.connect(simulator.input);
