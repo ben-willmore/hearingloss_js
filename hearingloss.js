@@ -1,5 +1,4 @@
 // hearing loss simulation using web audio API
-//
 
 //example usage:
 if (false) {
@@ -22,9 +21,7 @@ if (false) {
     //var simulator = createCISimulation(context, 7, 200, 7000);
     simulator.output.connect(context.destination);
   }
-  
 }
-
 
 function createPresbyacusisSimulation(context, frequency_cutoff, gain_value) {
   // low-pass filter
@@ -35,6 +32,29 @@ function createPresbyacusisSimulation(context, frequency_cutoff, gain_value) {
   
   var filter = context.createBiquadFilter();
   filter.type = filter.LOWPASS;
+  filter.Q.value = 1;
+  filter.frequency.value = frequency_cutoff;
+  components[components.length] = filter;
+  
+  var gain = context.createGain();
+  gain.gain.value = gain_value;
+  
+  filter.connect(gain);
+  components[components.length] = gain;
+
+  var processor = {frequency_cutoff: frequency_cutoff, gain: gain_value, input:filter, output:gain, components:components};
+  return processor;
+}
+
+function createMenieresSimulation(context, frequency_cutoff, gain_value) {
+  // high-pass filter
+  
+  // keep reference to all components -- seems to be necessary, presumably
+  // to prevent garbage collection
+  var components = new Array;
+  
+  var filter = context.createBiquadFilter();
+  filter.type = filter.HIGHPASS;
   filter.Q.value = 1;
   filter.frequency.value = frequency_cutoff;
   components[components.length] = filter;
@@ -145,4 +165,20 @@ function createModulatorNode(context) {
     }
   }
   return node;
+}
+
+function createEcho(context, delay, gain) {
+  // repeating echo
+  var components = new Array;  
+  var delayNode = context.createDelay(2);
+  delayNode.delayTime.value = delay;
+  components[components.length] = delayNode;
+  var gainNode = context.createGain();
+  gainNode.gain.value = gain;
+  components[components.length] = gainNode;
+  delayNode.connect(gainNode);
+  gainNode.connect(delayNode);
+  
+  var processor = {input:delayNode, output:gainNode, components:components};
+  return processor;
 }
