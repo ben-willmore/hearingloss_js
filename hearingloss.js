@@ -1,4 +1,22 @@
 // hearing loss simulation using web audio API
+//
+// example usage:
+// presbyacusisDemo();
+
+function presbyacusisDemo() {
+  window.AudioContext = ( window.AudioContext || window.webkitAudioContext );
+  var context = new AudioContext();
+  navigator.getMedia = ( navigator.getUserMedia ||
+                         navigator.webkitGetUserMedia ||
+                         navigator.mozGetUserMedia ||
+                         navigator.msGetUserMedia );
+  navigator.getMedia({video:false, audio:true}, gotAudio);
+
+  var simulator = createPresbyacusisSimulation(context, 100, 40);
+  //var simulator = createCISimulation(context, 7, 200, 7000);
+  simulator.output.connect(context.destination);
+  microphone.connect(simulator.input);
+}
 
 function createPresbyacusisSimulation(context, frequency_cutoff, gain_value) {
   // low-pass filter
